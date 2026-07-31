@@ -33,8 +33,6 @@ config_dir=/etc/systemd/sleep.conf.d
 unit_dir=/etc/systemd/system
 state_dir=/var/lib/hibernate-and-reboot
 windows_config=/etc/hibernate-and-reboot.conf
-legacy_drop_in=/etc/systemd/sleep.conf.d/50-reboot-after-sleep.conf
-legacy_hook=/usr/lib/systemd/system-sleep/disable-hibernate-reboot
 
 command -v systemctl >/dev/null 2>&1 || {
   echo "systemctl is required." >&2
@@ -57,10 +55,6 @@ install -D -m 0755 "$script_dir/lib/update-windows-boot-id" \
 rm -f /usr/local/libexec/hibernate-and-reboot/update-windows-boot-id
 rmdir /usr/local/libexec/hibernate-and-reboot 2>/dev/null || true
 install -d -m 0755 "$state_dir"
-
-# Migrate the original version of this setup. These are the exact paths it
-# documented, and keeping them could leave HibernateMode=reboot always active.
-rm -f "$legacy_drop_in" "$legacy_hook"
 
 if [ ! -e "$windows_config" ] || [ -n "$windows_boot_id" ]; then
   if [ -z "$windows_boot_id" ] && command -v efibootmgr >/dev/null 2>&1; then

@@ -19,9 +19,6 @@ Run from this directory:
 sudo ./install.sh
 ```
 
-When upgrading the original version of this setup, the installer removes its
-old `50-reboot-after-sleep.conf` drop-in and `disable-hibernate-reboot` hook.
-
 The installer detects the first UEFI boot entry named `Windows Boot Manager`.
 To select one explicitly, use:
 
