@@ -1,0 +1,13 @@
+[Unit]
+Description=Hibernate once, then reboot
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/install -d -m 0755 /var/lib/hibernate-and-reboot
+ExecStart=/usr/bin/touch /var/lib/hibernate-and-reboot/pending
+ExecStart=/usr/bin/sed -i s@^#HibernateMode=reboot$@HibernateMode=reboot@ /etc/systemd/sleep.conf.d/90-hibernate-and-reboot.conf
+ExecStart=/usr/bin/systemctl hibernate
+# Reached when this system resumes from the hibernation image.
+ExecStart=/usr/bin/sed -i s@^HibernateMode=reboot$@#HibernateMode=reboot@ /etc/systemd/sleep.conf.d/90-hibernate-and-reboot.conf
+ExecStart=/usr/bin/rm -f /var/lib/hibernate-and-reboot/pending

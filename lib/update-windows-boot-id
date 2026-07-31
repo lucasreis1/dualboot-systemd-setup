@@ -1,0 +1,30 @@
+#!/bin/sh
+set -eu
+
+config=/etc/hibernate-and-reboot.conf
+
+if ! command -v efibootmgr >/dev/null 2>&1; then
+  echo "efibootmgr is unavailable; keeping the existing Windows BootNext configuration." >&2
+  exit 0
+fi
+
+boot_id=$(efibootmgr 2>/dev/null | awk '
+  /^Boot[[:xdigit:]]{4}\*?[[:space:]]+Windows Boot Manager/ {
+    id = substr($1, 5, 4)
+    gsub(/\*/, "", id)
+    print id
+    exit
+  }
+' || true)
+
+if [ -z "$boot_id" ]; then
+  echo "No Windows Boot Manager UEFI entry found; keeping the existing Windows BootNext configuration." >&2
+  exit 0
+fi
+
+umask 022
+temporary_config=$(mktemp /etc/hibernate-and-reboot.conf.XXXXXX)
+trap 'rm -f "$temporary_config"' EXIT HUP INT TERM
+printf '# Managed by hibernate-and-reboot; refreshed at boot.\nWINDOWS_BOOT_ID=%s\n' "$boot_id" > "$temporary_config"
+mv -f "$temporary_config" "$config"
+trap - EXIT HUP INT TERM

@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh the Windows UEFI BootNext entry ID
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/hibernate-and-reboot/update-windows-boot-id
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Hibernate Linux, then boot once into Windows via UEFI BootNext
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/hibernate-and-reboot.conf
+ExecStartPre=/usr/bin/test -d /sys/firmware/efi
+ExecStartPre=/usr/bin/test -n ${WINDOWS_BOOT_ID}
+ExecStartPre=/usr/bin/test -x /usr/bin/efibootmgr
+ExecStart=/usr/bin/efibootmgr --bootnext ${WINDOWS_BOOT_ID}
+ExecStart=/usr/bin/systemctl start hibernate-and-reboot.service

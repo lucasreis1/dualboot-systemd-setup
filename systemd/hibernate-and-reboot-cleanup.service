@@ -1,0 +1,12 @@
+[Unit]
+Description=Restore normal hibernation after hibernate-and-reboot
+After=local-fs.target
+ConditionPathExists=/var/lib/hibernate-and-reboot/pending
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/sed -i s@^HibernateMode=reboot$@#HibernateMode=reboot@ /etc/systemd/sleep.conf.d/90-hibernate-and-reboot.conf
+ExecStart=/usr/bin/rm -f /var/lib/hibernate-and-reboot/pending
+
+[Install]
+WantedBy=multi-user.target
